@@ -1,0 +1,27 @@
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: fail2ban-allow
+spec:
+  order: 10
+  selector: all()
+  types:
+    - Ingress
+  ingress:
+    - action: Allow
+
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: fail2ban
+spec:
+  order: 0
+  selector: all()
+  types:
+    - Ingress
+  ingress:
+    - action: Deny
+      source:
+        selector: fail2ban == 'jail'
