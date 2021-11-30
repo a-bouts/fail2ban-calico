@@ -9,7 +9,7 @@ RUN if [ $TARGETPLATFORM = "linux/arm64" ]; then \
     mv /target/aarch64-unknown-linux-gnu/release/fail2ban-calico /fail2ban-calico; \
   elif [ $TARGETPLATFORM = "linux/amd64" ]; then \
     mv /target/x86_64-unknown-linux-gnu/release/fail2ban-calico /fail2ban-calico; \
-  fi; \
+  fi
 
 
 FROM debian
