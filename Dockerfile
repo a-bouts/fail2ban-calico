@@ -3,6 +3,7 @@ FROM debian as builder
 ARG TARGETPLATFORM
 
 COPY ./aarch64-unknown-linux-gnu /target/aarch64-unknown-linux-gnu
+COPY ./x86_64-unknown-linux-gnu /target/x86_64-unknown-linux-gnu
 
 RUN if [ $TARGETPLATFORM = "linux/arm64" ]; then \
     mv /target/aarch64-unknown-linux-gnu/release/fail2ban-calico /fail2ban-calico; \
