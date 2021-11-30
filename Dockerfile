@@ -21,7 +21,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     exim4 \
     bsd-mailx \
     whois \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /fail2ban-calico /usr/bin/
 
