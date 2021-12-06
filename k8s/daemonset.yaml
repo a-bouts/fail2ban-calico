@@ -1,1 +1,66 @@
 ---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fail2ban
+  namespace: fail2ban
+spec:
+  selector:
+    matchLabels:
+      app: fail2ban
+  template:
+    metadata:
+      labels:
+        app: fail2ban
+    spec:
+      priorityClassName: system-node-critical
+      serviceAccountName: fail2ban
+      containers:
+        - name: fail2ban
+          image: stoub/fail2ban-calico:98ee8615
+          args: ["fail2ban-server", "-f"]
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 1m
+              memory: 50Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/fail2ban/action.d/calico-action.conf
+              readOnly: true
+              subPath: calico-action.conf
+            - name: config
+              mountPath: /etc/fail2ban/fail2ban.local
+              readOnly: true
+              subPath: fail2ban.local
+            - name: config
+              mountPath: /etc/fail2ban/jail.local
+              readOnly: true
+              subPath: jail.local
+            - name: jails
+              mountPath: /etc/fail2ban/jail.d
+              readOnly: true
+            - name: filters
+              mountPath: /etc/fail2ban/filter.d/custom-postfix-sasl.local
+              subPath: custom-postfix-sasl.local
+              readOnly: true
+            - name: logs
+              mountPath: /var/log/pods/
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            defaultMode: 0600
+            name: fail2ban-config
+        - name: jails
+          configMap:
+            defaultMode: 0600
+            name: fail2ban-jails
+        - name: filters
+          configMap:
+            defaultMode: 0600
+            name: fail2ban-filters
+        - name: logs
+          hostPath:
+            path: /var/log/pods
