@@ -1,22 +1,16 @@
-FROM debian as builder
+FROM debian as debian-arm64
 
-ARG TARGETPLATFORM
-
-COPY ./aarch64-unknown-linux-gnu /target/aarch64-unknown-linux-gnu
-COPY ./x86_64-unknown-linux-gnu /target/x86_64-unknown-linux-gnu
-
-RUN if [ $TARGETPLATFORM = "linux/arm64" ]; then \
-    mv /target/aarch64-unknown-linux-gnu/release/fail2ban-calico /fail2ban-calico; \
-  elif [ $TARGETPLATFORM = "linux/amd64" ]; then \
-    mv /target/x86_64-unknown-linux-gnu/release/fail2ban-calico /fail2ban-calico; \
-  fi; \
-  chmod +x /fail2ban-calico
+ARG FAIL2BAN_CALICO=./aarch64-unknown-linux-gnu/release/fail2ban-calico
+ARG S6_OVERLAY_RELEASE=https://github.com/just-containers/s6-overlay/releases/latest/download/s6-overlay-aarch64.tar.gz
 
 
-FROM debian
+FROM debian as debian-amd64
 
+ARG FAIL2BAN_CALICO=./x86_64-unknown-linux-gnu/release/fail2ban-calico
 ARG S6_OVERLAY_RELEASE=https://github.com/just-containers/s6-overlay/releases/latest/download/s6-overlay-amd64.tar.gz
-ENV S6_OVERLAY_RELEASE=${S6_OVERLAY_RELEASE}
+
+
+FROM debian-${TARGETARCH}
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -y -q && \
@@ -34,6 +28,7 @@ RUN tar xzf /tmp/s6overlay.tar.gz -C / \
 
 ADD rootfs /
 
-COPY --from=builder /fail2ban-calico /usr/bin/
+COPY ${FAIL2BAN_CALICO} /usr/bin/
+RUN chmod +x /usr/bin/fail2ban-calico
 
 ENTRYPOINT [ "/init" ]
