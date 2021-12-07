@@ -17,7 +17,7 @@ spec:
       serviceAccountName: fail2ban
       containers:
         - name: fail2ban
-          image: stoub/fail2ban-calico:98ee8615
+          image: stoub/fail2ban-calico:7ac3e126
           args: ["fail2ban-server", "-f"]
           resources:
             limits:
@@ -44,6 +44,10 @@ spec:
             - name: filters
               mountPath: /etc/fail2ban/filter.d/custom-postfix-sasl.local
               subPath: custom-postfix-sasl.local
+              readOnly: true
+            - name: filters
+              mountPath: /etc/fail2ban/filter.d/custom-vaultwarden.local
+              subPath: custom-vaultwarden.local
               readOnly: true
             - name: logs
               mountPath: /var/log/pods/
